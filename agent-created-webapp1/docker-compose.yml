@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  # Express application
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:27017/express-api
+      - JWT_SECRET=your-super-secret-key-change-in-production
+      - JWT_EXPIRES_IN=24h
+      - LOG_LEVEL=debug
+    depends_on:
+      - mongo
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # MongoDB database
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data: 
