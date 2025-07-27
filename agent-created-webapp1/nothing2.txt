@@ -1,0 +1,3 @@
+This is a text file that is going to be used for documenting test cases.
+
+So far we have no test cases for this repository but eventually each and every test will be documented here.
