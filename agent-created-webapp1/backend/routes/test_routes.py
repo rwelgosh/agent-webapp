@@ -1,4 +1,5 @@
 from test_helpers import validate_response_format, create_mock_request_data, format_test_result
+from test_utilities import simulate_api_response, generate_test_user_data, check_required_fields, log_test_execution
 
 
 def test_response_validation():
@@ -55,6 +56,50 @@ def test_integration_scenario():
                            "Mock creation → Processing → Validation"))
 
 
+def test_api_utilities():
+    """Test that demonstrates using the API utility functions"""
+    # Generate test user data
+    test_user = generate_test_user_data(1)
+    print(format_test_result("User Data Generation", test_user is not None))
+    
+    # Test multiple users
+    multiple_users = generate_test_user_data(3)
+    has_three_users = isinstance(multiple_users, list) and len(multiple_users) == 3
+    print(format_test_result("Multiple User Generation", has_three_users))
+    
+    # Simulate successful API response
+    success_response = simulate_api_response(200, {"user": test_user})
+    is_success = success_response["success"] and "data" in success_response
+    print(format_test_result("API Response - Success", is_success))
+    
+    # Simulate error API response
+    error_response = simulate_api_response(404, error_message="User not found")
+    is_error = not error_response["success"] and "error" in error_response
+    print(format_test_result("API Response - Error", is_error))
+
+
+def test_field_validation():
+    """Test field validation using utilities"""
+    from datetime import datetime
+    
+    start_time = datetime.now()
+    
+    # Test complete user data
+    complete_user = generate_test_user_data(1)
+    required_user_fields = ["id", "username", "email", "role"]
+    
+    is_valid, missing = check_required_fields(complete_user, required_user_fields)
+    print(format_test_result("Field Validation - Complete", is_valid))
+    
+    # Test incomplete data
+    incomplete_data = {"id": 1, "username": "test"}
+    is_invalid, missing_fields = check_required_fields(incomplete_data, required_user_fields)
+    print(format_test_result("Field Validation - Incomplete", not is_invalid, f"Missing: {missing_fields}"))
+    
+    end_time = datetime.now()
+    print(log_test_execution("Field Validation Tests", start_time, end_time))
+
+
 if __name__ == "__main__":
     print("Running Python test suite for routes...")
     print("=" * 50)
@@ -66,6 +111,12 @@ if __name__ == "__main__":
     print()
     
     test_integration_scenario()
+    print()
+    
+    test_api_utilities()
+    print()
+    
+    test_field_validation()
     print()
     
     print("=" * 50)
